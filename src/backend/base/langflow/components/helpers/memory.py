@@ -1,7 +1,13 @@
 from langflow.custom import Component
 from langflow.helpers.data import data_to_text
 from langflow.inputs import HandleInput
-from langflow.io import DropdownInput, IntInput, MessageTextInput, MultilineInput, Output
+from langflow.io import (
+    DropdownInput,
+    IntInput,
+    MessageTextInput,
+    MultilineInput,
+    Output,
+)
 from langflow.memory import aget_messages
 from langflow.schema import Data
 from langflow.schema.dataframe import DataFrame
@@ -11,7 +17,9 @@ from langflow.utils.constants import MESSAGE_SENDER_AI, MESSAGE_SENDER_USER
 
 class MemoryComponent(Component):
     display_name = "Message History"
-    description = "Retrieves stored chat messages from Langflow tables or an external memory."
+    description = (
+        "Retrieves stored chat messages from Langflow tables or an external memory."
+    )
     icon = "message-square-more"
     name = "Memory"
 
@@ -70,7 +78,11 @@ class MemoryComponent(Component):
 
     outputs = [
         Output(display_name="Data", name="messages", method="retrieve_messages"),
-        Output(display_name="Message", name="messages_text", method="retrieve_messages_as_text"),
+        Output(
+            display_name="Message",
+            name="messages_text",
+            method="retrieve_messages_as_text",
+        ),
         Output(display_name="DataFrame", name="dataframe", method="as_dataframe"),
     ]
 
@@ -89,6 +101,9 @@ class MemoryComponent(Component):
             err_msg = f"External Memory object ({memory_name}) must have 'aget_messages' method."
             raise AttributeError(err_msg)
 
+        import pdb
+
+        pdb.set_trace()
         if self.memory:
             # override session_id
             self.memory.session_id = session_id
@@ -101,7 +116,11 @@ class MemoryComponent(Component):
                 stored = stored[:n_messages]
             stored = [Message.from_lc_message(m) for m in stored]
             if sender:
-                expected_type = MESSAGE_SENDER_AI if sender == MESSAGE_SENDER_AI else MESSAGE_SENDER_USER
+                expected_type = (
+                    MESSAGE_SENDER_AI
+                    if sender == MESSAGE_SENDER_AI
+                    else MESSAGE_SENDER_USER
+                )
                 stored = [m for m in stored if m.type == expected_type]
         else:
             stored = await aget_messages(

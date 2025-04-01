@@ -5,6 +5,7 @@ from dataclasses import asdict, dataclass, field
 from astrapy import AstraDBAdmin, DataAPIClient, Database
 from astrapy.info import CollectionDescriptor
 from langchain_astradb import AstraDBVectorStore, CollectionVectorServiceOptions
+from langchain_core.documents import Document
 
 from langflow.base.vectorstores.model import LCVectorStoreComponent, check_cached_vector_store
 from langflow.base.vectorstores.vector_store_connection_decorator import vector_store_connection
@@ -1058,7 +1059,7 @@ class AstraDBVectorStoreComponent(LCVectorStoreComponent):
 
         return args
 
-    def search_documents(self, vector_store=None) -> list[Data]:
+    def _search_documents(self, vector_store=None) -> list[Document]:
         vector_store = vector_store or self.build_vector_store()
 
         self.log(f"Search input: {self.search_query}")
@@ -1086,6 +1087,11 @@ class AstraDBVectorStoreComponent(LCVectorStoreComponent):
             raise ValueError(msg) from e
 
         self.log(f"Retrieved documents: {len(docs)}")
+
+        return docs
+
+    def search_documents(self, vector_store=None) -> list[Data]:
+        docs = self._search_documents(vector_store)
 
         data = docs_to_data(docs)
         self.log(f"Converted documents to data: {len(data)}")
